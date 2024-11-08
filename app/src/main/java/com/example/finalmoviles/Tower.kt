@@ -5,5 +5,5 @@ data class Tower(
     val y: Float,
     val damage: Int,
     val range: Float,
-    val type: GameActivity.TowerType
+    val type: GameFragment.TowerType
 )

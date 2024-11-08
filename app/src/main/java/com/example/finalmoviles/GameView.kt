@@ -18,7 +18,7 @@ class GameView @JvmOverloads constructor(
     private val path = Path()
     private val enemies = mutableListOf<Enemy>()
     private val towers = mutableListOf<Tower>()
-    private val gameScope = CoroutineScope(Dispatchers.Main + Job())
+    val gameScope = CoroutineScope(Dispatchers.Main + Job())
 
     private val waypoints = listOf(
         PointF(0f, 300f),
@@ -55,10 +55,10 @@ class GameView @JvmOverloads constructor(
 
             if (enemy.reachedEnd(waypoints.last())) {
                 iterator.remove()
-                (context as? GameActivity)?.onEnemyReachedEnd()
-            } else if (enemy.health <= 0) {
+                (context as? GameFragment)?.onEnemyReachedEnd(enemy)
+            } else if (enemy.isDead()) {
                 iterator.remove()
-                (context as? GameActivity)?.onEnemyKilled()
+                (context as? GameFragment)?.onEnemyKilled(enemy)
             }
         }
     }
@@ -98,8 +98,8 @@ class GameView @JvmOverloads constructor(
             paint.apply {
                 style = Paint.Style.FILL
                 color = when (tower.type) {
-                    GameActivity.TowerType.BASIC -> Color.BLUE
-                    GameActivity.TowerType.ADVANCED -> Color.RED
+                    GameFragment.TowerType.BASIC -> Color.BLUE
+                    GameFragment.TowerType.ADVANCED -> Color.RED
                 }
             }
             canvas.drawRect(
@@ -150,9 +150,10 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    fun spawnEnemy() {
-        enemies.add(Enemy(waypoints[0].x, waypoints[0].y))
+    fun spawnEnemy(wave: Int) {
+        enemies.add(Enemy.createForWave(wave, waypoints[0]))
     }
+
 
     fun addTower(tower: Tower) {
         towers.add(tower)

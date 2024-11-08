@@ -1,20 +1,28 @@
 package com.example.finalmoviles
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.btnPlay).setOnClickListener {
-            val intent = Intent(this, GameActivity::class.java)
-            startActivity(intent)
+        if (savedInstanceState == null) {
+            // Solo agregar el fragmento inicial si es la primera creación
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add(R.id.fragmentContainer, MainMenuFragment.newInstance())
+            }
         }
+    }
 
-        findViewById<Button>(R.id.btnHighScores).setOnClickListener {}
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else {
+            super.onBackPressed()
+        }
     }
 }
