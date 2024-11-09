@@ -2,6 +2,7 @@ package com.example.finalmoviles
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -16,7 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class GameFragment : Fragment() {
+class GameFragment : Fragment(), GameView.GameCallbacks {
     private var playerLives = 20
     private var playerMoney = 75
     private var currentWave = 1
@@ -52,6 +53,7 @@ class GameFragment : Fragment() {
         tvWave = view.findViewById(R.id.tvWave)
         tvScore = view.findViewById(R.id.tvScore)
         gameView = view.findViewById(R.id.gameView)
+        gameView.setGameCallbacks(this)
 
         setupTowerSelectors()
         setupGameViewTouchListener()
@@ -140,24 +142,24 @@ class GameFragment : Fragment() {
         return (10000 + (currentWave * 1000)).toLong()
     }
 
-    fun onEnemyReachedEnd(enemy: Enemy) {
+    override fun onEnemyReachedEnd(enemy: Enemy) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
             playerLives -= enemy.damage
             updateUI()
 
-        // Verifica si el juego debe terminar
             if (playerLives <= 0) {
                 gameOver()
-                }
+            }
         }
     }
 
-    fun onEnemyKilled(enemy: Enemy) {
-        playerMoney += enemy.reward
-        score += 20 + currentWave
-        updateUI()
+    override fun onEnemyKilled(enemy: Enemy) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+            playerMoney += enemy.reward
+            score += 20 + currentWave
+            updateUI()
+        }
     }
-
 
     private fun gameOver() {
         gameView.gameScope.cancel()

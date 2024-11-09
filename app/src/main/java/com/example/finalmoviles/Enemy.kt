@@ -27,7 +27,8 @@ class Enemy(
                 y = startPoint.y,
                 health = (baseHealth * healthMultiplier).toInt(),
                 speed = baseSpeed * speedMultiplier,
-                reward = baseReward + wave
+                reward = baseReward + wave,
+                damage = 4
             )
         }
     }

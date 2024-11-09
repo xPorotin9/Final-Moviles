@@ -39,6 +39,20 @@ class GameView @JvmOverloads constructor(
         startGameLoop()
     }
 
+    // Añade esta interfaz al inicio de la clase
+    interface GameCallbacks {
+        fun onEnemyReachedEnd(enemy: Enemy)
+        fun onEnemyKilled(enemy: Enemy)
+    }
+
+    // Añade esta propiedad
+    private var gameCallbacks: GameCallbacks? = null
+
+    // Añade este método
+    fun setGameCallbacks(callbacks: GameCallbacks) {
+        gameCallbacks = callbacks
+    }
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         val lastPoint = waypoints.last()
@@ -79,10 +93,9 @@ class GameView @JvmOverloads constructor(
             val enemy = iterator.next()
             enemy.move(waypoints)
 
-            // Verificar si el enemigo llegó al final
             if (checkEnemyCollision(enemy)) {
                 (context as? FragmentActivity)?.runOnUiThread {
-                    (context as? GameFragment)?.onEnemyReachedEnd(enemy)
+                    gameCallbacks?.onEnemyReachedEnd(enemy)
                 }
                 iterator.remove()
                 continue
@@ -90,7 +103,7 @@ class GameView @JvmOverloads constructor(
 
             if (enemy.isDead()) {
                 iterator.remove()
-                (context as? GameFragment)?.onEnemyKilled(enemy)
+                gameCallbacks?.onEnemyKilled(enemy)
             }
         }
     }
