@@ -15,15 +15,16 @@ class GameView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val paint = Paint()
-    private val path = Path()
-    private val enemies = mutableListOf<Enemy>()
-    private val towers = mutableListOf<Tower>()
-    val gameScope = CoroutineScope(Dispatchers.Main + Job())
+    private val paint = Paint()  // Pincel para dibujar elementos.
+    private val path = Path()  // Camino para los enemigos.
+    private val enemies = mutableListOf<Enemy>()  // Lista de enemigos en el juego.
+    private val towers = mutableListOf<Tower>()  // Lista de torres en el juego.
+    val gameScope = CoroutineScope(Dispatchers.Main + Job())  // Alcance para la corutina del juego.
 
-    // Zona final con RectF para mejor detección de colisiones
+    // Rectángulo que representa la zona final del juego.
     private lateinit var endZone: RectF
 
+    // Puntos de ruta que siguen los enemigos.
     private val waypoints = listOf(
         PointF(0f, 300f),
         PointF(200f, 300f),
@@ -32,27 +33,28 @@ class GameView @JvmOverloads constructor(
     )
 
     init {
+        // Configura el camino que seguirán los enemigos.
         path.moveTo(waypoints[0].x, waypoints[0].y)
         for (i in 1 until waypoints.size) {
             path.lineTo(waypoints[i].x, waypoints[i].y)
         }
-        startGameLoop()
+        startGameLoop()  // Inicia el bucle de juego.
     }
 
-    // Añade esta interfaz al inicio de la clase
+    // Interfaz de callbacks para eventos del juego.
     interface GameCallbacks {
-        fun onEnemyReachedEnd(enemy: Enemy)
-        fun onEnemyKilled(enemy: Enemy)
+        fun onEnemyReachedEnd(enemy: Enemy)  // Llamado cuando un enemigo llega al final.
+        fun onEnemyKilled(enemy: Enemy)  // Llamado cuando un enemigo es derrotado.
     }
 
-    // Añade esta propiedad
-    private var gameCallbacks: GameCallbacks? = null
+    private var gameCallbacks: GameCallbacks? = null  // Referencia a los callbacks de juego.
 
-    // Añade este método
+    // Configura los callbacks para los eventos del juego.
     fun setGameCallbacks(callbacks: GameCallbacks) {
         gameCallbacks = callbacks
     }
 
+    // Configura el tamaño de la vista y la zona final.
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         val lastPoint = waypoints.last()
@@ -64,19 +66,20 @@ class GameView @JvmOverloads constructor(
         )
     }
 
+    // Inicia el bucle principal de actualización de la vista de juego.
     private fun startGameLoop() {
         gameScope.launch {
             while (isActive) {
-                updateEnemies()
-                updateTowers()
-                invalidate()
-                delay(16)
+                updateEnemies()  // Actualiza la posición de los enemigos.
+                updateTowers()  // Actualiza las acciones de las torres.
+                invalidate()  // Redibuja la vista.
+                delay(16)  // Retraso para simular 60 FPS.
             }
         }
     }
 
+    // Verifica si un enemigo ha colisionado con la zona final.
     private fun checkEnemyCollision(enemy: Enemy): Boolean {
-        // Crear un círculo para el enemigo (usando su posición y radio)
         val enemyRadius = 20f
         val enemyBounds = RectF(
             enemy.x - enemyRadius,
@@ -87,6 +90,7 @@ class GameView @JvmOverloads constructor(
         return enemyBounds.intersect(endZone)
     }
 
+    // Actualiza la posición y estado de cada enemigo.
     private fun updateEnemies() {
         val iterator = enemies.iterator()
         while (iterator.hasNext()) {
@@ -108,6 +112,7 @@ class GameView @JvmOverloads constructor(
         }
     }
 
+    // Actualiza el comportamiento de cada torre para atacar enemigos dentro de su rango.
     private fun updateTowers() {
         towers.forEach { tower ->
             val target = enemies.firstOrNull { enemy ->
@@ -119,18 +124,19 @@ class GameView @JvmOverloads constructor(
             }
 
             target?.let { enemy ->
-                enemy.health -= tower.damage
+                enemy.health -= tower.damage  // Disminuye la vida del enemigo si está en rango.
             }
         }
     }
 
+    // Dibuja los elementos en la vista.
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        // Dibujar fondo
+        // Dibujar fondo.
         canvas.drawColor(Color.DKGRAY)
 
-        // Dibujar camino
+        // Dibujar camino.
         paint.apply {
             color = Color.GRAY
             style = Paint.Style.STROKE
@@ -138,23 +144,15 @@ class GameView @JvmOverloads constructor(
         }
         canvas.drawPath(path, paint)
 
-        // Dibujar zona final
+        // Dibujar zona final.
         paint.apply {
             color = Color.RED
             style = Paint.Style.FILL
-            alpha = 80 // Más transparente
+            alpha = 80  // Transparencia.
         }
         canvas.drawRect(endZone, paint)
 
-        // Borde de la zona final
-        paint.apply {
-            style = Paint.Style.STROKE
-            strokeWidth = 5f
-            alpha = 255 // Completamente opaco
-        }
-        canvas.drawRect(endZone, paint)
-
-        // Dibujar torres
+        // Dibujar torres en el área de juego.
         towers.forEach { tower ->
             paint.apply {
                 style = Paint.Style.FILL
@@ -171,39 +169,18 @@ class GameView @JvmOverloads constructor(
                 tower.y + 25f,
                 paint
             )
-
-            // Dibujar rango
-            if (tower == towers.lastOrNull()) {
-                paint.apply {
-                    style = Paint.Style.STROKE
-                    color = Color.GRAY
-                    strokeWidth = 2f
-                }
-                canvas.drawCircle(tower.x, tower.y, tower.range, paint)
-            }
         }
 
-        // Dibujar enemigos
+        // Dibujar enemigos con indicador de salud.
         enemies.forEach { enemy ->
-            // Cuerpo del enemigo
             paint.apply {
                 style = Paint.Style.FILL
                 color = Color.RED
                 alpha = 255
             }
-            canvas.drawCircle(enemy.x, enemy.y, 20f, paint)
+            canvas.drawCircle(enemy.x, enemy.y, 20f, paint)  // Dibuja cuerpo del enemigo.
 
-
-            paint.color = Color.BLACK
-            canvas.drawRect(
-                enemy.x - 25f,
-                enemy.y - 35f,
-                enemy.x + 25f,
-                enemy.y - 30f,
-                paint
-            )
-            // Vida actual en verde
-            paint.color = Color.GREEN
+            paint.color = Color.GREEN  // Barra de salud.
             val healthWidth = (enemy.health / 100f) * 50f
             canvas.drawRect(
                 enemy.x - 25f,
@@ -215,10 +192,12 @@ class GameView @JvmOverloads constructor(
         }
     }
 
+    // Agrega un nuevo enemigo al inicio de la ruta.
     fun spawnEnemy(wave: Int) {
         enemies.add(Enemy.createForWave(wave, waypoints[0]))
     }
 
+    // Agrega una torre a la lista de torres en la vista.
     fun addTower(tower: Tower) {
         towers.add(tower)
     }
