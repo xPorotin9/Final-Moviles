@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.*
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -63,12 +64,13 @@ class GameView @JvmOverloads constructor(
     private fun checkEnemyCollision(enemy: Enemy): Boolean {
         // Crear un círculo para el enemigo (usando su posición y radio)
         val enemyRadius = 20f
-        return RectF(
+        val enemyBounds = RectF(
             enemy.x - enemyRadius,
             enemy.y - enemyRadius,
             enemy.x + enemyRadius,
             enemy.y + enemyRadius
-        ).intersect(endZone)
+        )
+        return enemyBounds.intersect(endZone)
     }
 
     private fun updateEnemies() {
@@ -77,11 +79,10 @@ class GameView @JvmOverloads constructor(
             val enemy = iterator.next()
             enemy.move(waypoints)
 
-            // Verificar colisión con la zona final
+            // Verificar si el enemigo llegó al final
             if (checkEnemyCollision(enemy)) {
-                val fragment = context as? GameFragment
-                if (fragment != null) {
-                    fragment.onEnemyReachedEnd(enemy)
+                (context as? FragmentActivity)?.runOnUiThread {
+                    (context as? GameFragment)?.onEnemyReachedEnd(enemy)
                 }
                 iterator.remove()
                 continue

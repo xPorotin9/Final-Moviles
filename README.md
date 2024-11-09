@@ -8,7 +8,7 @@ conceptos aprendidos durante el curso de programacion para dispositivos moviles.
 
 ## Funcionalidades principales
 ### Sistema de Torres y Defensa
-- Implementacion de 2-3 o m ́as tipos de torres
+- Implementacion de 2-3 o más tipos de torres
 - Sistema de colocación de torres en espacios permitidos
 - Mecánica de disparo basica para cada torre
 - Gestion de recursos (monedas/puntos) para comprar torres
@@ -35,7 +35,7 @@ conceptos aprendidos durante el curso de programacion para dispositivos moviles.
 
 
 ## Integrantes
-- [@José C. Machaca](https://www.github.com/xPorotin9)
-- [@Diego Alessandro Alvarez Cruz](https://github.com/Alessandro-22)
-- [@Jhosep Alonzo Mollapaza](https://github.com/JhosepLS)
+- [@José Carlos Machaca](https://www.github.com/xPorotin9)
+- [@Diego Alessandro Alvarez](https://github.com/Alessandro-22)
+- [@Jhosep Alonso Mollapaza](https://github.com/JhosepLS)
 - [@Patrick Andres Ramirez](https://github.com/patrickram99?tab=repositories)

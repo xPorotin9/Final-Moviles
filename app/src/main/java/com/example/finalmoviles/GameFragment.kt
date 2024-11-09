@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -140,12 +141,14 @@ class GameFragment : Fragment() {
     }
 
     fun onEnemyReachedEnd(enemy: Enemy) {
-        playerLives -= enemy.damage
-        updateUI()
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
+            playerLives -= enemy.damage
+            updateUI()
 
         // Verifica si el juego debe terminar
-        if (playerLives <= 0) {
-            gameOver()
+            if (playerLives <= 0) {
+                gameOver()
+                }
         }
     }
 
