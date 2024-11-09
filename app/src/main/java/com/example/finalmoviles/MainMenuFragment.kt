@@ -5,10 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 
 class MainMenuFragment : Fragment() {
+
+    companion object {
+        fun newInstance(): MainMenuFragment {
+            return MainMenuFragment()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -20,19 +28,26 @@ class MainMenuFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<Button>(R.id.btnPlay).setOnClickListener {
-            parentFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace(R.id.fragmentContainer, GameFragment())
-                addToBackStack(null)
+        // Configurar el título
+        view.findViewById<TextView>(R.id.titleText).text = getString(R.string.menu_titulo)
+
+        // Configurar el botón de jugar
+        view.findViewById<Button>(R.id.btnPlay).apply {
+            text = getString(R.string.menu_boton_jugar)
+            setOnClickListener {
+                parentFragmentManager.commit {
+                    replace(R.id.fragmentContainer, GameFragment())
+                    addToBackStack(null)
+                }
             }
         }
 
-        view.findViewById<Button>(R.id.btnHighScores).setOnClickListener {
+        // Configurar el botón de puntuaciones
+        view.findViewById<Button>(R.id.btnHighScores).apply {
+            text = getString(R.string.menu_boton_puntuaciones)
+            setOnClickListener {
+                // Por implementar c:
+            }
         }
-    }
-
-    companion object {
-        fun newInstance() = MainMenuFragment()
     }
 }

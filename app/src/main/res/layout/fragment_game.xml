@@ -69,7 +69,7 @@
 
             <LinearLayout
                 android:id="@+id/basicTower"
-                android:layout_width="wrap_content"
+                android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="16dp"
                 android:orientation="vertical"
@@ -81,16 +81,25 @@
                     android:background="@drawable/tower_basic_background"/>
 
                 <TextView
+                    android:id="@+id/basicTowerName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Torre Básica\n$50"
                     android:textAlignment="center"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/black"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/basicTowerCost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"/>
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/advancedTower"
-                android:layout_width="wrap_content"
+                android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="16dp"
                 android:orientation="vertical"
@@ -102,14 +111,22 @@
                     android:background="@drawable/tower_advanced_background"/>
 
                 <TextView
+                    android:id="@+id/advancedTowerName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Torre Avanzada\n$100"
                     android:textAlignment="center"
-                    android:textColor="@color/black"/>
-            </LinearLayout>
+                    android:textColor="@color/black"
+                    android:textSize="12sp"/>
 
+                <TextView
+                    android:id="@+id/advancedTowerCost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"/>
+
+            </LinearLayout>
         </LinearLayout>
     </HorizontalScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

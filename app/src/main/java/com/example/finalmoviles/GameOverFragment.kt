@@ -14,10 +14,12 @@ class GameOverFragment : Fragment() {
         private const val ARG_SCORE = "score"
         private const val ARG_WAVE = "wave"
 
-        fun newInstance(score: Int, wave: Int) = GameOverFragment().apply {
-            arguments = Bundle().apply {
-                putInt(ARG_SCORE, score)
-                putInt(ARG_WAVE, wave)
+        fun newInstance(score: Int, wave: Int): GameOverFragment {
+            return GameOverFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_SCORE, score)
+                    putInt(ARG_WAVE, wave)
+                }
             }
         }
     }
@@ -36,20 +38,25 @@ class GameOverFragment : Fragment() {
         val score = arguments?.getInt(ARG_SCORE, 0) ?: 0
         val wave = arguments?.getInt(ARG_WAVE, 0) ?: 0
 
-        view.findViewById<TextView>(R.id.tvFinalScore).text = "Puntuación Final: $score"
-        view.findViewById<TextView>(R.id.tvWaveReached).text = "Oleada Alcanzada: $wave"
+        view.findViewById<TextView>(R.id.tvGameOverTitle).text = getString(R.string.fin_juego_titulo)
+        view.findViewById<TextView>(R.id.tvFinalScore).text = getString(R.string.fin_juego_puntuacion, score)
+        view.findViewById<TextView>(R.id.tvWaveReached).text = getString(R.string.fin_juego_oleada, wave)
 
-        // Configurar el botón de jugar de nuevo
-        view.findViewById<Button>(R.id.btnPlayAgain).setOnClickListener {
-            parentFragmentManager.commit {
-                replace(R.id.fragmentContainer, GameFragment())
+        view.findViewById<Button>(R.id.btnPlayAgain).apply {
+            text = getString(R.string.fin_juego_jugar_nuevo)
+            setOnClickListener {
+                parentFragmentManager.commit {
+                    replace(R.id.fragmentContainer, GameFragment())
+                }
             }
         }
 
-        // Configurar el botón de menú principal
-        view.findViewById<Button>(R.id.btnMainMenu).setOnClickListener {
-            parentFragmentManager.commit {
-                replace(R.id.fragmentContainer, MainMenuFragment.newInstance())
+        view.findViewById<Button>(R.id.btnMainMenu).apply {
+            text = getString(R.string.fin_juego_menu_principal)
+            setOnClickListener {
+                parentFragmentManager.commit {
+                    replace(R.id.fragmentContainer, MainMenuFragment())
+                }
             }
         }
     }

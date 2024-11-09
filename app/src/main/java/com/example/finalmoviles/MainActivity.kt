@@ -9,19 +9,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Solo agregar el fragmento inicial si no hay estado guardado
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                add(R.id.fragmentContainer, MainMenuFragment.newInstance())
+                replace(R.id.fragmentContainer, MainMenuFragment.newInstance())
             }
-        }
-    }
-
-    override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
-        } else {
-            super.onBackPressed()
         }
     }
 }

@@ -1,3 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FinalMoviles</string>
+    <!-- Nombre de la aplicación -->
+    <string name="app_name">Turrim Ruinam</string>
+
+    <!-- Textos del menú principal -->
+    <string name="menu_titulo">Turrim Ruinam</string>
+    <string name="menu_boton_jugar">Jugar</string>
+    <string name="menu_boton_puntuaciones">Puntuaciones</string>
+
+    <!-- Textos de la interfaz del juego -->
+    <string name="juego_vidas">Vidas: %1$d</string>
+    <string name="juego_monedas">Monedas: %1$d</string>
+    <string name="juego_oleada">Oleada: %1$d</string>
+    <string name="juego_puntos">Puntos: %1$d</string>
+
+    <!-- Textos de las torres -->
+    <string name="torre_basica_nombre">Torre Básica</string>
+    <string name="torre_basica_costo">$%1$d</string>
+    <string name="torre_avanzada_nombre">Torre Avanzada</string>
+    <string name="torre_avanzada_costo">$%1$d</string>
+
+    <!-- Textos de fin del juego -->
+    <string name="fin_juego_titulo">¡Fin del Juego!</string>
+    <string name="fin_juego_puntuacion">Puntuación Final: %1$d</string>
+    <string name="fin_juego_oleada">Oleada Alcanzada: %1$d</string>
+    <string name="fin_juego_jugar_nuevo">Jugar de nuevo</string>
+    <string name="fin_juego_menu_principal">Menú Principal</string>
+
 </resources>

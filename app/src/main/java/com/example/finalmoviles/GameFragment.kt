@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
@@ -62,18 +63,32 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
     }
 
     private fun setupTowerSelectors() {
-        view?.findViewById<View>(R.id.basicTower)?.setOnClickListener {
-            if (playerMoney >= TowerType.BASIC.cost) {
+        // Configurar Torre Básica
+        view?.findViewById<LinearLayout>(R.id.basicTower)?.let { basicTowerLayout ->
+            basicTowerLayout.findViewById<TextView>(R.id.basicTowerName)?.text =
+                getString(R.string.torre_basica_nombre)
+            basicTowerLayout.findViewById<TextView>(R.id.basicTowerCost)?.text =
+                getString(R.string.torre_basica_costo, TowerType.BASIC.cost)
+
+            basicTowerLayout.setOnClickListener {
                 selectedTowerType = TowerType.BASIC
             }
         }
 
-        view?.findViewById<View>(R.id.advancedTower)?.setOnClickListener {
-            if (playerMoney >= TowerType.ADVANCED.cost) {
+        // Configurar Torre Avanzada
+        view?.findViewById<LinearLayout>(R.id.advancedTower)?.let { advancedTowerLayout ->
+            advancedTowerLayout.findViewById<TextView>(R.id.advancedTowerName)?.text =
+                getString(R.string.torre_avanzada_nombre)
+            advancedTowerLayout.findViewById<TextView>(R.id.advancedTowerCost)?.text =
+                getString(R.string.torre_avanzada_costo, TowerType.ADVANCED.cost)
+
+            advancedTowerLayout.setOnClickListener {
                 selectedTowerType = TowerType.ADVANCED
             }
         }
     }
+
+
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGameViewTouchListener() {
@@ -102,10 +117,10 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
 
     @SuppressLint("SetTextI18n")
     private fun updateUI() {
-        tvLives.text = "Vidas: $playerLives"
-        tvMoney.text = "Monedas: $playerMoney"
-        tvWave.text = "Oleada: $currentWave"
-        tvScore.text = "Puntos: $score"
+        tvLives.text = getString(R.string.juego_vidas, playerLives)
+        tvMoney.text = getString(R.string.juego_monedas, playerMoney)
+        tvWave.text = getString(R.string.juego_oleada, currentWave)
+        tvScore.text = getString(R.string.juego_puntos, score)
     }
 
     private fun startGame() {
