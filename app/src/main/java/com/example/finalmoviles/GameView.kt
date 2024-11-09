@@ -20,6 +20,9 @@ class GameView @JvmOverloads constructor(
     private val towers = mutableListOf<Tower>()
     val gameScope = CoroutineScope(Dispatchers.Main + Job())
 
+    // Zona final con RectF para mejor detección de colisiones
+    private lateinit var endZone: RectF
+
     private val waypoints = listOf(
         PointF(0f, 300f),
         PointF(200f, 300f),
@@ -32,8 +35,18 @@ class GameView @JvmOverloads constructor(
         for (i in 1 until waypoints.size) {
             path.lineTo(waypoints[i].x, waypoints[i].y)
         }
-
         startGameLoop()
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        val lastPoint = waypoints.last()
+        endZone = RectF(
+            lastPoint.x - 40f,
+            lastPoint.y - 60f,
+            lastPoint.x + 40f,
+            lastPoint.y + 60f
+        )
     }
 
     private fun startGameLoop() {
@@ -47,16 +60,34 @@ class GameView @JvmOverloads constructor(
         }
     }
 
+    private fun checkEnemyCollision(enemy: Enemy): Boolean {
+        // Crear un círculo para el enemigo (usando su posición y radio)
+        val enemyRadius = 20f
+        return RectF(
+            enemy.x - enemyRadius,
+            enemy.y - enemyRadius,
+            enemy.x + enemyRadius,
+            enemy.y + enemyRadius
+        ).intersect(endZone)
+    }
+
     private fun updateEnemies() {
         val iterator = enemies.iterator()
         while (iterator.hasNext()) {
             val enemy = iterator.next()
             enemy.move(waypoints)
 
-            if (enemy.reachedEnd(waypoints.last())) {
+            // Verificar colisión con la zona final
+            if (checkEnemyCollision(enemy)) {
+                val fragment = context as? GameFragment
+                if (fragment != null) {
+                    fragment.onEnemyReachedEnd(enemy)
+                }
                 iterator.remove()
-                (context as? GameFragment)?.onEnemyReachedEnd(enemy)
-            } else if (enemy.isDead()) {
+                continue
+            }
+
+            if (enemy.isDead()) {
                 iterator.remove()
                 (context as? GameFragment)?.onEnemyKilled(enemy)
             }
@@ -83,7 +114,7 @@ class GameView @JvmOverloads constructor(
         super.onDraw(canvas)
 
         // Dibujar fondo
-        canvas.drawColor(Color.WHITE)
+        canvas.drawColor(Color.DKGRAY)
 
         // Dibujar camino
         paint.apply {
@@ -93,6 +124,22 @@ class GameView @JvmOverloads constructor(
         }
         canvas.drawPath(path, paint)
 
+        // Dibujar zona final
+        paint.apply {
+            color = Color.RED
+            style = Paint.Style.FILL
+            alpha = 80 // Más transparente
+        }
+        canvas.drawRect(endZone, paint)
+
+        // Borde de la zona final
+        paint.apply {
+            style = Paint.Style.STROKE
+            strokeWidth = 5f
+            alpha = 255 // Completamente opaco
+        }
+        canvas.drawRect(endZone, paint)
+
         // Dibujar torres
         towers.forEach { tower ->
             paint.apply {
@@ -101,6 +148,7 @@ class GameView @JvmOverloads constructor(
                     GameFragment.TowerType.BASIC -> Color.BLUE
                     GameFragment.TowerType.ADVANCED -> Color.RED
                 }
+                alpha = 255
             }
             canvas.drawRect(
                 tower.x - 25f,
@@ -110,7 +158,7 @@ class GameView @JvmOverloads constructor(
                 paint
             )
 
-            // Dibujar rango (cuando se está colocando)
+            // Dibujar rango
             if (tower == towers.lastOrNull()) {
                 paint.apply {
                     style = Paint.Style.STROKE
@@ -122,14 +170,16 @@ class GameView @JvmOverloads constructor(
         }
 
         // Dibujar enemigos
-        paint.apply {
-            style = Paint.Style.FILL
-            color = Color.RED
-        }
         enemies.forEach { enemy ->
+            // Cuerpo del enemigo
+            paint.apply {
+                style = Paint.Style.FILL
+                color = Color.RED
+                alpha = 255
+            }
             canvas.drawCircle(enemy.x, enemy.y, 20f, paint)
 
-            // Barra de vida
+
             paint.color = Color.BLACK
             canvas.drawRect(
                 enemy.x - 25f,
@@ -138,6 +188,7 @@ class GameView @JvmOverloads constructor(
                 enemy.y - 30f,
                 paint
             )
+            // Vida actual en verde
             paint.color = Color.GREEN
             val healthWidth = (enemy.health / 100f) * 50f
             canvas.drawRect(
@@ -153,7 +204,6 @@ class GameView @JvmOverloads constructor(
     fun spawnEnemy(wave: Int) {
         enemies.add(Enemy.createForWave(wave, waypoints[0]))
     }
-
 
     fun addTower(tower: Tower) {
         towers.add(tower)

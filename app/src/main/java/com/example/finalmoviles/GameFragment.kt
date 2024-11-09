@@ -110,40 +110,40 @@ class GameFragment : Fragment() {
             while (playerLives > 0 && isActive) {
                 waveInProgress = true
                 startWave()
-                delay(getWaveDuration()) // Duración variable de la oleada
-                if (playerLives > 0) { // Solo dar recompensa si sobrevive
-                    val waveReward = 20 + (currentWave * 5) // Recompensa base + bonus por oleada
+                delay(getWaveDuration())
+                if (playerLives > 0) {
+                    val waveReward = 20 + (currentWave * 5)
                     playerMoney += waveReward
-                    score += 100 + (currentWave * 25) // Puntuación base + bonus por oleada
+                    score += 100 + (currentWave * 25)
                     currentWave++
                     updateUI()
                 }
                 waveInProgress = false
-                delay(3000) // Pequeña pausa entre oleadas
+                delay(3000)
             }
             gameOver()
         }
     }
 
     private fun startWave() {
-        val enemyCount = 5 + (currentWave * 2) // Más enemigos por oleada
+        val enemyCount = 5 + (currentWave * 2)
         viewLifecycleOwner.lifecycleScope.launch {
             repeat(enemyCount) {
                 gameView.spawnEnemy(currentWave)
-                delay(1000L - (currentWave * 50L).coerceAtMost(800L)) // Spawn más rápido en oleadas avanzadas
+                delay(1000L - (currentWave * 50L).coerceAtMost(800L))
             }
         }
     }
 
-
     private fun getWaveDuration(): Long {
-        // La duración de la oleada aumenta con cada nivel
         return (10000 + (currentWave * 1000)).toLong()
     }
 
     fun onEnemyReachedEnd(enemy: Enemy) {
         playerLives -= enemy.damage
         updateUI()
+
+        // Verifica si el juego debe terminar
         if (playerLives <= 0) {
             gameOver()
         }
@@ -155,10 +155,9 @@ class GameFragment : Fragment() {
         updateUI()
     }
 
+
     private fun gameOver() {
         gameView.gameScope.cancel()
-
-        // Mostrar el fragmento de game over
         parentFragmentManager.commit {
             replace(R.id.fragmentContainer, GameOverFragment.newInstance(score, currentWave))
             addToBackStack(null)

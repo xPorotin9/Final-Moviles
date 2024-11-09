@@ -10,7 +10,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (savedInstanceState == null) {
-            // Solo agregar el fragmento inicial si es la primera creación
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
                 add(R.id.fragmentContainer, MainMenuFragment.newInstance())

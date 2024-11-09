@@ -38,16 +38,5 @@ class GameOverFragment : Fragment() {
 
         view.findViewById<TextView>(R.id.tvFinalScore).text = "Puntuación Final: $score"
         view.findViewById<TextView>(R.id.tvWaveReached).text = "Oleada Alcanzada: $wave"
-
-        view.findViewById<Button>(R.id.btnPlayAgain).setOnClickListener {
-            parentFragmentManager.commit {
-                replace(R.id.fragmentContainer, GameFragment())
-                addToBackStack(null)
-            }
-        }
-
-        view.findViewById<Button>(R.id.btnMainMenu).setOnClickListener {
-            parentFragmentManager.popBackStack(null, 0)
-        }
     }
 }
