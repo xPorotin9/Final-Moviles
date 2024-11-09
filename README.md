@@ -29,7 +29,7 @@ conceptos aprendidos durante el curso de programacion para dispositivos moviles.
 - Nivel unico que avanza a medida del tiempo (enemigos mas fuertes)
 
 ## Fallas
-- Sin game over (enemigos no causan daño al llegar al final del camino)
+- Sin game over (enemigos no causan daño al llegar al final del camino) [Corregido]
 - Torretas pueden ser colocadas encima de otras o encima del camino
 - Mal balance
 
