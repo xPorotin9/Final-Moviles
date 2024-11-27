@@ -133,23 +133,26 @@ class GameView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        // Dibujar fondo.
-        canvas.drawColor(Color.DKGRAY)
+        // Dibujar fondo con un verde específico
+        canvas.drawColor(Color.parseColor("#4CAF50"))
 
-        // Dibujar camino.
+        // Dibujar camino con un gris más definido
         paint.apply {
-            color = Color.GRAY
+            color = Color.parseColor("#9E9E9E")
             style = Paint.Style.STROKE
             strokeWidth = 50f
         }
         canvas.drawPath(path, paint)
-
         // Dibujar zona final.
+        canvas.drawPath(path, paint)
+
+        // Dibujar zona final con un rojo específico y transparencia
         paint.apply {
-            color = Color.RED
+            color = Color.parseColor("#F44336")  // Un rojo de Material Design
             style = Paint.Style.FILL
-            alpha = 80  // Transparencia.
+            alpha = 0  // Transparencia (valor entre 0-255)
         }
+
         canvas.drawRect(endZone, paint)
 
         // Dibujar torres en el área de juego.
