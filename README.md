@@ -31,7 +31,8 @@ conceptos aprendidos durante el curso de programacion para dispositivos moviles.
 - Mal balance
 - Funcionalidad de puntuaciones sin implementar (base de datos)
 - No se ve los ataques de las torretas y su rango
-- 
+- Crasheo al girar pantalla
+  
 ## Integrantes
 - [@José Carlos Machaca](https://www.github.com/xPorotin9)
 - [@Diego Alessandro Alvarez](https://github.com/Alessandro-22)
