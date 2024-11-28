@@ -98,21 +98,24 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
             if (event.action == MotionEvent.ACTION_UP && selectedTowerType != null) {
                 val towerType = selectedTowerType ?: return@setOnTouchListener true
 
-                // Coloca una torre si el jugador tiene suficiente dinero.
                 if (playerMoney >= towerType.cost) {
-                    playerMoney -= towerType.cost
-                    gameView.addTower(
-                        Tower(
-                            x = event.x,
-                            y = event.y,
-                            damage = towerType.damage,
-                            range = towerType.range,
-                            type = towerType
-                        )
+                    val tower = Tower(
+                        x = event.x,
+                        y = event.y,
+                        damage = towerType.damage,
+                        range = towerType.range,
+                        type = towerType
                     )
-                    updateUI()  // Actualiza la interfaz después de agregar la torre.
+
+                    if (gameView.addTower(tower)) {
+                        playerMoney -= towerType.cost
+                        updateUI()
+                    }
+                } else {
+                    // Mostrar mensaje de monedas insuficientes
+                    gameView.showError("No tienes suficientes monedas")
                 }
-                selectedTowerType = null  // Restablece la selección de torre.
+                selectedTowerType = null
             }
             true
         }
@@ -193,4 +196,5 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
             addToBackStack(null)
         }
     }
+
 }

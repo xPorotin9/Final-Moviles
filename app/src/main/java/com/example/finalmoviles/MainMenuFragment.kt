@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 
 class MainMenuFragment : Fragment() {
-
     companion object {
         fun newInstance(): MainMenuFragment {
             return MainMenuFragment()
@@ -28,8 +27,7 @@ class MainMenuFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Configurar el título
-        view.findViewById<TextView>(R.id.titleText).text = getString(R.string.menu_titulo)
+        // Ya no es necesario configurar el título de texto, ya que lo manejará el logo
 
         // Configurar el botón de jugar
         view.findViewById<Button>(R.id.btnPlay).apply {

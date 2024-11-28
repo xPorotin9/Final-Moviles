@@ -26,5 +26,6 @@
     <string name="fin_juego_oleada">Oleada Alcanzada: %1$d</string>
     <string name="fin_juego_jugar_nuevo">Jugar de nuevo</string>
     <string name="fin_juego_menu_principal">Menú Principal</string>
+    <string name="Nombre">Turrim Ruinam</string>
 
 </resources>

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/main_menu_background">
 
     <LinearLayout
         android:id="@+id/statusBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#EEEEEE"
+        android:background="#2196F3"
         android:orientation="horizontal"
         android:padding="8dp"
         app:layout_constraintTop_toTopOf="parent">
@@ -19,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Vidas: 20"
-            android:textColor="@color/black" />
+            android:textColor="@android:color/white" />
 
         <TextView
             android:id="@+id/tvMoney"
@@ -27,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Monedas: 100"
-            android:textColor="@color/black" />
+            android:textColor="@android:color/white" />
 
         <TextView
             android:id="@+id/tvWave"
@@ -35,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Oleada: 1"
-            android:textColor="@color/black" />
+            android:textColor="@android:color/white" />
 
         <TextView
             android:id="@+id/tvScore"
@@ -43,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Puntos: 0"
-            android:textColor="@color/black" />
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 
@@ -58,7 +60,7 @@
         android:id="@+id/towerSelector"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="#EEEEEE"
+        android:background="#CC000000"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
@@ -85,7 +87,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
-                    android:textColor="@color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="12sp"/>
 
                 <TextView
@@ -93,7 +95,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
-                    android:textColor="@color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="12sp"/>
             </LinearLayout>
 
@@ -115,7 +117,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
-                    android:textColor="@color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="12sp"/>
 
                 <TextView
@@ -123,7 +125,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
-                    android:textColor="@color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="12sp"/>
 
             </LinearLayout>
