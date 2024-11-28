@@ -23,14 +23,16 @@ conceptos aprendidos durante el curso de programacion para dispositivos moviles.
 - Sistema de niveles desbloqueables
 
 ## Funcionalidades de avance #2
-- Camino recorido extendido para los enemigos
-- Mejora del apartado vizual de la aplicación (imagen de fondo y GameOver)
+- Camino extendido para los enemigos
+- Mejora del apartado vizual de la aplicación (imagen de fondo, GameOver y logo)
 - Nivel unico que avanza a medida del tiempo (enemigos mas fuertes)
 
 ## Fallas
 - Mal balance
-- 
-
+- Funcionalidad de puntuaciones sin implementar (base de datos)
+- No se ve los ataques de las torretas y su rango
+- Crasheo al girar pantalla
+  
 ## Integrantes
 - [@José Carlos Machaca](https://www.github.com/xPorotin9)
 - [@Diego Alessandro Alvarez](https://github.com/Alessandro-22)
