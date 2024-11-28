@@ -17,7 +17,7 @@ class MusicManager(private val context: Context) {
             mainThemePlayer = MediaPlayer.create(context, R.raw.glamour)
             mainThemePlayer?.isLooping = true
         } catch (e: Exception) {
-            Log.e("MusicManager", "Error loading main theme", e)
+            Log.e("MusicManager", "Error", e)
         }
     }
 
@@ -36,7 +36,7 @@ class MusicManager(private val context: Context) {
                 mainThemePlayer?.start()
             }
         } catch (e: Exception) {
-            Log.e("MusicManager", "Error playing main theme", e)
+            Log.e("MusicManager", "Error", e)
         }
     }
 
@@ -54,7 +54,7 @@ class MusicManager(private val context: Context) {
             gameOverPlayer?.release()
             gameOverPlayer = MediaPlayer.create(context, R.raw.gameover)
         } catch (e: Exception) {
-            Log.e("MusicManager", "Error loading game over theme", e)
+            Log.e("MusicManager", "Error", e)
         }
     }
 
@@ -70,7 +70,7 @@ class MusicManager(private val context: Context) {
             loadGameOverTheme()
             gameOverPlayer?.start()
         } catch (e: Exception) {
-            Log.e("MusicManager", "Error playing game over theme", e)
+            Log.e("MusicManager", "Error", e)
         }
     }
 
@@ -84,7 +84,7 @@ class MusicManager(private val context: Context) {
                 gameOverPlayer = null  // Establecer a null después de liberar
             }
         } catch (e: Exception) {
-            Log.e("MusicManager", "Error stopping game over theme", e)
+            Log.e("MusicManager", "Error", e)
         }
     }
 
