@@ -22,17 +22,14 @@ conceptos aprendidos durante el curso de programacion para dispositivos moviles.
 - Guardado de progreso del jugador
 - Sistema de niveles desbloqueables
 
-## Funcionalidades de avance
-- Camino recorido por enemigos
-- Sistema de puntuación, dinero y oleadas
-- 2 tipos de torretas simples
+## Funcionalidades de avance #2
+- Camino recorido extendido para los enemigos
+- Mejora del apartado vizual de la aplicación (imagen de fondo y GameOver)
 - Nivel unico que avanza a medida del tiempo (enemigos mas fuertes)
 
 ## Fallas
-- Sin game over (enemigos no causan daño al llegar al final del camino) [Corregido]
-- Torretas pueden ser colocadas encima de otras o encima del camino
 - Mal balance
-
+- 
 
 ## Integrantes
 - [@José Carlos Machaca](https://www.github.com/xPorotin9)
