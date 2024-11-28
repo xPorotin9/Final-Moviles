@@ -20,6 +20,13 @@ class GameView @JvmOverloads constructor(
     private val enemies = mutableListOf<Enemy>()  // Lista de enemigos en el juego.
     private val towers = mutableListOf<Tower>()  // Lista de torres en el juego.
     val gameScope = CoroutineScope(Dispatchers.Main + Job())  // Alcance para la corutina del juego.
+    private val gridSize = 60f // Tamaño de cada celda de la cuadrícula
+    private val gridSpacing = 5f // Espacio entre celdas
+    private val towerSize = 40f // Tamaño de la torre dentro de la celda
+    private val gridCells = mutableMapOf<Pair<Int, Int>, Boolean>() // Mapa de celdas ocupadas
+    private var selectedCell: Pair<Int, Int>? = null
+    private var errorMessage: String? = null
+    private var errorMessageTimeout = 0L
 
     // Rectángulo que representa la zona final del juego.
     private lateinit var endZone: RectF
@@ -129,33 +136,110 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    // Dibuja los elementos en la vista.
+
+    // Método para convertir coordenadas de pantalla a coordenadas de cuadrícula
+    private fun screenToGrid(x: Float, y: Float): Pair<Int, Int>? {
+        val gridX = (x / (gridSize + gridSpacing)).toInt()
+        val gridY = (y / (gridSize + gridSpacing)).toInt()
+
+        // Verificar si está dentro de los límites y no en el camino
+        if (isValidGridPosition(gridX, gridY)) {
+            return Pair(gridX, gridY)
+        }
+        return null
+    }
+
+    // Verificar si una posición de cuadrícula es válida
+    private fun isValidGridPosition(gridX: Int, gridY: Int): Boolean {
+        val x = gridX * (gridSize + gridSpacing) + gridSize / 2
+        val y = gridY * (gridSize + gridSpacing) + gridSize / 2
+
+        // Verificar si está en el camino
+        val pathBounds = RectF()
+        val pathMeasure = PathMeasure(path, false)
+        pathMeasure.getSegment(0f, pathMeasure.length, Path(), true)
+        path.computeBounds(pathBounds, true)
+        pathBounds.inset(-30f, -30f) // Margen alrededor del camino
+
+        return !pathBounds.contains(x, y)
+    }
+
+    // Convertir coordenadas de cuadrícula a coordenadas de pantalla
+    private fun gridToScreen(gridX: Int, gridY: Int): Pair<Float, Float> {
+        val x = gridX * (gridSize + gridSpacing) + gridSize / 2
+        val y = gridY * (gridSize + gridSpacing) + gridSize / 2
+        return Pair(x, y)
+    }
+
+    fun addTower(tower: Tower): Boolean {
+        val gridPos = screenToGrid(tower.x, tower.y) ?: return false
+
+        if (gridCells[gridPos] == true) {
+            showError("Ya existe una torre en esta posición")
+            return false
+        }
+
+        if (!isValidGridPosition(gridPos.first, gridPos.second)) {
+            showError("No se puede colocar una torre en el camino")
+            return false
+        }
+
+        val (screenX, screenY) = gridToScreen(gridPos.first, gridPos.second)
+        towers.add(tower.copy(x = screenX, y = screenY))
+        gridCells[gridPos] = true
+        invalidate()
+        return true
+    }
+
+    fun showError(message: String) {
+        errorMessage = message
+        errorMessageTimeout = System.currentTimeMillis() + 2000 // Mostrar por 2 segundos
+        invalidate()
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        // Dibujar fondo con un verde específico
+        // Dibujar fondo
         canvas.drawColor(Color.parseColor("#4CAF50"))
 
-        // Dibujar camino con un gris más definido
+        // Dibujar cuadrícula
+        paint.apply {
+            style = Paint.Style.STROKE
+            color = Color.WHITE
+            alpha = 50
+            strokeWidth = 1f
+        }
+
+        // Dibujar líneas horizontales y verticales de la cuadrícula
+        val numRows = (height / (gridSize + gridSpacing)).toInt()
+        val numCols = (width / (gridSize + gridSpacing)).toInt()
+
+        for (i in 0..numRows) {
+            for (j in 0..numCols) {
+                val x = j * (gridSize + gridSpacing)
+                val y = i * (gridSize + gridSpacing)
+
+                if (isValidGridPosition(j, i)) {
+                    canvas.drawRect(
+                        x, y,
+                        x + gridSize,
+                        y + gridSize,
+                        paint
+                    )
+                }
+            }
+        }
+
+        // Dibujar camino
         paint.apply {
             color = Color.parseColor("#9E9E9E")
             style = Paint.Style.STROKE
             strokeWidth = 50f
         }
         canvas.drawPath(path, paint)
-        // Dibujar zona final.
-        canvas.drawPath(path, paint)
 
-        // Dibujar zona final con un rojo específico y transparencia
-        paint.apply {
-            color = Color.parseColor("#F44336")  // Un rojo de Material Design
-            style = Paint.Style.FILL
-            alpha = 0  // Transparencia (valor entre 0-255)
-        }
-
-        canvas.drawRect(endZone, paint)
-
-        // Dibujar torres en el área de juego.
+        // Dibujar torres
         towers.forEach { tower ->
             paint.apply {
                 style = Paint.Style.FILL
@@ -165,25 +249,26 @@ class GameView @JvmOverloads constructor(
                 }
                 alpha = 255
             }
+
             canvas.drawRect(
-                tower.x - 25f,
-                tower.y - 25f,
-                tower.x + 25f,
-                tower.y + 25f,
+                tower.x - towerSize/2,
+                tower.y - towerSize/2,
+                tower.x + towerSize/2,
+                tower.y + towerSize/2,
                 paint
             )
         }
 
-        // Dibujar enemigos con indicador de salud.
+        // Dibujar enemigos
         enemies.forEach { enemy ->
             paint.apply {
                 style = Paint.Style.FILL
                 color = Color.RED
                 alpha = 255
             }
-            canvas.drawCircle(enemy.x, enemy.y, 20f, paint)  // Dibuja cuerpo del enemigo.
+            canvas.drawCircle(enemy.x, enemy.y, 20f, paint)
 
-            paint.color = Color.GREEN  // Barra de salud.
+            paint.color = Color.GREEN
             val healthWidth = (enemy.health / 100f) * 50f
             canvas.drawRect(
                 enemy.x - 25f,
@@ -193,15 +278,25 @@ class GameView @JvmOverloads constructor(
                 paint
             )
         }
+
+        // Dibujar mensaje de error si existe
+        errorMessage?.let { message ->
+            if (System.currentTimeMillis() < errorMessageTimeout) {
+                paint.apply {
+                    color = Color.WHITE
+                    textSize = 40f
+                    textAlign = Paint.Align.CENTER
+                    style = Paint.Style.FILL
+                }
+                canvas.drawText(message, width/2f, 100f, paint)
+            } else {
+                errorMessage = null
+            }
+        }
     }
 
     // Agrega un nuevo enemigo al inicio de la ruta.
     fun spawnEnemy(wave: Int) {
         enemies.add(Enemy.createForWave(wave, waypoints[0]))
-    }
-
-    // Agrega una torre a la lista de torres en la vista.
-    fun addTower(tower: Tower) {
-        towers.add(tower)
     }
 }
