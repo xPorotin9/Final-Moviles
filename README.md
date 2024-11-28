@@ -32,6 +32,7 @@ conceptos aprendidos durante el curso de programacion para dispositivos moviles.
 - Funcionalidad de puntuaciones sin implementar (base de datos)
 - No se ve los ataques de las torretas y su rango
 - Crasheo al girar pantalla
+- Musica de Game Over digue reproduciéndose
   
 ## Integrantes
 - [@José Carlos Machaca](https://www.github.com/xPorotin9)
