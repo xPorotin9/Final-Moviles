@@ -14,38 +14,73 @@ class GameView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
-
-    private val paint = Paint()  // Pincel para dibujar elementos.
-    private val path = Path()  // Camino para los enemigos.
-    private val enemies = mutableListOf<Enemy>()  // Lista de enemigos en el juego.
-    private val towers = mutableListOf<Tower>()  // Lista de torres en el juego.
-    val gameScope = CoroutineScope(Dispatchers.Main + Job())  // Alcance para la corutina del juego.
-    private val gridSize = 60f // Tamaño de cada celda de la cuadrícula
-    private val gridSpacing = 5f // Espacio entre celdas
-    private val towerSize = 40f // Tamaño de la torre dentro de la celda
-    private val gridCells = mutableMapOf<Pair<Int, Int>, Boolean>() // Mapa de celdas ocupadas
+    private val paint = Paint()
+    private val path = Path()
+    private val enemies = mutableListOf<Enemy>()
+    private val towers = mutableListOf<Tower>()
+    val gameScope = CoroutineScope(Dispatchers.Main + Job())
+    private val gridSize = 60f
+    private val gridSpacing = 5f
+    private val towerSize = 40f
+    private val gridCells = mutableMapOf<Pair<Int, Int>, Boolean>()
     private var selectedCell: Pair<Int, Int>? = null
     private var errorMessage: String? = null
     private var errorMessageTimeout = 0L
 
     // Rectángulo que representa la zona final del juego.
+    private val waypoints = mutableListOf<PointF>()
     private lateinit var endZone: RectF
 
-    // Puntos de ruta que siguen los enemigos.
-    private val waypoints = listOf(
-        PointF(0f, 300f),
-        PointF(200f, 300f),
-        PointF(200f, 500f),
-        PointF(800f, 500f)
-    )
-
     init {
-        // Configura el camino que seguirán los enemigos.
+        startGameLoop()  // Inicia el bucle de juego.
+    }
+
+    // Configura el tamaño de la vista y la zona final.
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+
+        // Calcular los waypoints basados en la cuadrícula
+        val gridCol = (gridSize + gridSpacing)
+        val gridRow = (gridSize + gridSpacing)
+
+        // Limpiar waypoints anteriores
+        waypoints.clear()
+
+        // Crear un camino más largo y con más giros que llegue hasta el fondo
+        waypoints.addAll(listOf(
+            PointF(0f, 2 * gridRow),                    // Inicio desde la izquierda
+            PointF(4 * gridCol, 2 * gridRow),           // Derecha
+            PointF(4 * gridCol, 4 * gridRow),           // Baja
+            PointF(12 * gridCol, 4 * gridRow),          // Derecha
+            PointF(12 * gridCol, 6 * gridRow),          // Baja
+            PointF(2 * gridCol, 6 * gridRow),           // Izquierda
+            PointF(2 * gridCol, 8 * gridRow),           // Baja
+            PointF(14 * gridCol, 8 * gridRow),          // Derecha
+            PointF(14 * gridCol, 12 * gridRow),         // Baja
+            PointF(4 * gridCol, 12 * gridRow),          // Izquierda
+            PointF(4 * gridCol, 16 * gridRow),          // Baja
+            PointF(12 * gridCol, 16 * gridRow),         // Derecha
+            PointF(12 * gridCol, 20 * gridRow),         // Baja
+            PointF(2 * gridCol, 20 * gridRow),          // Izquierda
+            PointF(2 * gridCol, 22 * gridRow),          // Baja
+            PointF(15 * gridCol, 22 * gridRow)          // Final derecha
+        ))
+
+        // Actualizar el path
+        path.reset()
         path.moveTo(waypoints[0].x, waypoints[0].y)
         for (i in 1 until waypoints.size) {
             path.lineTo(waypoints[i].x, waypoints[i].y)
         }
-        startGameLoop()  // Inicia el bucle de juego.
+
+        // Actualizar la zona final
+        val lastPoint = waypoints.last()
+        endZone = RectF(
+            lastPoint.x - 40f,
+            lastPoint.y - 60f,
+            lastPoint.x + 40f,
+            lastPoint.y + 60f
+        )
     }
 
     // Interfaz de callbacks para eventos del juego.
@@ -59,18 +94,6 @@ class GameView @JvmOverloads constructor(
     // Configura los callbacks para los eventos del juego.
     fun setGameCallbacks(callbacks: GameCallbacks) {
         gameCallbacks = callbacks
-    }
-
-    // Configura el tamaño de la vista y la zona final.
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        val lastPoint = waypoints.last()
-        endZone = RectF(
-            lastPoint.x - 40f,
-            lastPoint.y - 60f,
-            lastPoint.x + 40f,
-            lastPoint.y + 60f
-        )
     }
 
     // Inicia el bucle principal de actualización de la vista de juego.
@@ -154,16 +177,39 @@ class GameView @JvmOverloads constructor(
         val x = gridX * (gridSize + gridSpacing) + gridSize / 2
         val y = gridY * (gridSize + gridSpacing) + gridSize / 2
 
-        // Verificar si está en el camino
-        val pathBounds = RectF()
-        val pathMeasure = PathMeasure(path, false)
-        pathMeasure.getSegment(0f, pathMeasure.length, Path(), true)
-        path.computeBounds(pathBounds, true)
-        pathBounds.inset(-30f, -30f) // Margen alrededor del camino
+        // Crear un margen más preciso alrededor del camino
+        val pathWidth = 50f // Debe coincidir con el strokeWidth del camino
+        val margin = pathWidth / 2 + 5f // Un pequeño margen adicional
 
-        return !pathBounds.contains(x, y)
+        // Comprobar si el punto está cerca de algún segmento del camino
+        for (i in 0 until waypoints.size - 1) {
+            val x1 = waypoints[i].x
+            val y1 = waypoints[i].y
+            val x2 = waypoints[i + 1].x
+            val y2 = waypoints[i + 1].y
+
+            // Si es un segmento horizontal
+            if (y1 == y2) {
+                val minX = minOf(x1, x2)
+                val maxX = maxOf(x1, x2)
+                if (x >= minX - margin && x <= maxX + margin &&
+                    y >= y1 - margin && y <= y1 + margin) {
+                    return false
+                }
+            }
+            // Si es un segmento vertical
+            else if (x1 == x2) {
+                val minY = minOf(y1, y2)
+                val maxY = maxOf(y1, y2)
+                if (y >= minY - margin && y <= maxY + margin &&
+                    x >= x1 - margin && x <= x1 + margin) {
+                    return false
+                }
+            }
+        }
+
+        return true
     }
-
     // Convertir coordenadas de cuadrícula a coordenadas de pantalla
     private fun gridToScreen(gridX: Int, gridY: Int): Pair<Float, Float> {
         val x = gridX * (gridSize + gridSpacing) + gridSize / 2
@@ -297,6 +343,8 @@ class GameView @JvmOverloads constructor(
 
     // Agrega un nuevo enemigo al inicio de la ruta.
     fun spawnEnemy(wave: Int) {
-        enemies.add(Enemy.createForWave(wave, waypoints[0]))
+        if (waypoints.isNotEmpty()) {
+            enemies.add(Enemy.createForWave(wave, waypoints[0]))
+        }
     }
 }
