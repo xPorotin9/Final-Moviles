@@ -2,7 +2,6 @@ package com.example.finalmoviles
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -19,22 +18,23 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class GameFragment : Fragment(), GameView.GameCallbacks {
-    private var playerLives = 20  // Vidas iniciales del jugador.
-    private var playerMoney = 75  // Monedas inicial del jugador.
+    private var playerLives = 20
+    private var playerMoney = 75
     private var currentWave = 1
-    private var score = 0  // Puntuación
-    private var waveInProgress = false  // Indica si una ola está en progreso.
+    private var score = 0
+    private var waveInProgress = false
 
-    private var selectedTowerType: TowerType? = null  // Tipo de torre seleccionada.
+    private var selectedTowerType: TowerType? = null
 
-    // Elementos de la interfaz para mostrar estado de juego.
     private lateinit var tvLives: TextView
     private lateinit var tvMoney: TextView
     private lateinit var tvWave: TextView
     private lateinit var tvScore: TextView
     private lateinit var gameView: GameView
 
-    enum class TowerType(val cost: Int, val damage: Int, val range: Float) { // Datos de torres.
+    private lateinit var musicManager: MusicManager
+
+    enum class TowerType(val cost: Int, val damage: Int, val range: Float) {
         BASIC(50, 5, 150f),
         ADVANCED(120, 12, 200f)
     }
@@ -50,7 +50,11 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Inicializa los elementos de la interfaz.
+        // Reiniciar completamente el MusicManager
+        musicManager = MusicManager(requireContext())
+        musicManager.loadMainTheme()
+        musicManager.playMainTheme()
+
         tvLives = view.findViewById(R.id.tvLives)
         tvMoney = view.findViewById(R.id.tvMoney)
         tvWave = view.findViewById(R.id.tvWave)
@@ -58,13 +62,13 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         gameView = view.findViewById(R.id.gameView)
         gameView.setGameCallbacks(this)
 
-        setupTowerSelectors()  // Configura botones para seleccionar torres.
-        setupGameViewTouchListener()  // Configura la detección de toques en la vista de juego.
+        setupTowerSelectors()
+        setupGameViewTouchListener()
         updateUI()
         startGame()
     }
 
-    // Configura las opciones de selección de torre en la interfaz.
+
     private fun setupTowerSelectors() {
         view?.findViewById<LinearLayout>(R.id.basicTower)?.let { basicTowerLayout ->
             basicTowerLayout.findViewById<TextView>(R.id.basicTowerName)?.text =
@@ -72,7 +76,6 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
             basicTowerLayout.findViewById<TextView>(R.id.basicTowerCost)?.text =
                 getString(R.string.torre_basica_costo, TowerType.BASIC.cost)
 
-            // Selecciona la torre básica al hacer clic.
             basicTowerLayout.setOnClickListener {
                 selectedTowerType = TowerType.BASIC
             }
@@ -84,14 +87,12 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
             advancedTowerLayout.findViewById<TextView>(R.id.advancedTowerCost)?.text =
                 getString(R.string.torre_avanzada_costo, TowerType.ADVANCED.cost)
 
-            // Selecciona la torre avanzada al hacer clic.
             advancedTowerLayout.setOnClickListener {
                 selectedTowerType = TowerType.ADVANCED
             }
         }
     }
 
-    // Configura el detector de toques en la vista del juego.
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGameViewTouchListener() {
         gameView.setOnTouchListener { _, event ->
@@ -112,7 +113,6 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
                         updateUI()
                     }
                 } else {
-                    // Mostrar mensaje de monedas insuficientes
                     gameView.showError("No tienes suficientes monedas")
                 }
                 selectedTowerType = null
@@ -121,7 +121,6 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         }
     }
 
-    // Actualiza la interfaz con la información actual del juego.
     @SuppressLint("SetTextI18n")
     private fun updateUI() {
         tvLives.text = getString(R.string.juego_vidas, playerLives)
@@ -130,15 +129,22 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         tvScore.text = getString(R.string.juego_puntos, score)
     }
 
-    // Inicia el bucle del juego.
     private fun startGame() {
+        // Asegurarse de que la música principal esté sonando al inicio
+        musicManager.loadMainTheme()
+        musicManager.playMainTheme()
+
         viewLifecycleOwner.lifecycleScope.launch {
             while (playerLives > 0 && isActive) {
-                waveInProgress = true
-                startWave()  // Inicia una nueva ola de enemigos.
-                delay(getWaveDuration())  // Espera el tiempo de duración de la ola.
+                // Agregar verificación y reproducción de música
+                if (!musicManager.isMainThemePlaying()) {
+                    musicManager.playMainTheme()
+                }
 
-                // Otorga recompensas si el jugador sigue en juego.
+                waveInProgress = true
+                startWave()
+                delay(getWaveDuration())
+
                 if (playerLives > 0) {
                     val waveReward = 20 + (currentWave * 5)
                     playerMoney += waveReward
@@ -147,54 +153,65 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
                     updateUI()
                 }
                 waveInProgress = false
-                delay(3000)  // Pausa antes de la siguiente ola.
+                delay(3000)
             }
-            gameOver()  // Termina el juego si el jugador pierde todas las vidas.
+            gameOver()
         }
     }
 
-    // Inicia el despliegue de enemigos en una ola.
     private fun startWave() {
-        val enemyCount = 5 + (currentWave * 2)  // Calcula cantidad de enemigos en la ola.
+        val enemyCount = 5 + (currentWave * 2)
         viewLifecycleOwner.lifecycleScope.launch {
             repeat(enemyCount) {
-                gameView.spawnEnemy(currentWave)  // Agrega un enemigo en la vista.
-                delay(1000L - (currentWave * 50L).coerceAtMost(800L))  // Espera entre enemigos.
+                gameView.spawnEnemy(currentWave)
+                delay(1000L - (currentWave * 50L).coerceAtMost(800L))
             }
         }
     }
 
     private fun getWaveDuration(): Long {
-        return (10000 + (currentWave * 1000)).toLong()  // Duración de cada ola en milisegundos.
+        return (10000 + (currentWave * 1000)).toLong()
     }
 
-    // Maneja eventos cuando el enemigo llega al final del camino.
     override fun onEnemyReachedEnd(enemy: Enemy) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            playerLives -= enemy.damage  // Resta vidas del jugador.
+            playerLives -= enemy.damage
             updateUI()
 
             if (playerLives <= 0) {
-                gameOver()  // Termina el juego si no quedan vidas.
+                gameOver()
             }
         }
     }
 
-    // Maneja eventos cuando el enemigo es derrotado.
     override fun onEnemyKilled(enemy: Enemy) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main) {
-            playerMoney += enemy.reward  // Incrementa el dinero del jugador.
-            score += 20 + currentWave  // Incrementa la puntuación.
+            playerMoney += enemy.reward
+            score += 20 + currentWave
             updateUI()
         }
     }
 
     private fun gameOver() {
-        gameView.gameScope.cancel()  // Detiene la vista de juego.
-        parentFragmentManager.commit {
-            replace(R.id.fragmentContainer, GameOverFragment.newInstance(score, currentWave))  // Muestra el fragmento de fin de juego.
-            addToBackStack(null)
+        // Asegúrate de que la música de game over se reproduzca antes de cambiar de fragmento
+        musicManager.stopAndReleaseGameOverTheme() // Liberar cualquier música anterior
+        musicManager.loadGameOverTheme()
+        musicManager.playGameOverTheme()
+
+        // Añade un pequeño retraso para permitir que la música comience a reproducirse
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(500) // Pequeño retraso para asegurar que la música comience
+            gameView.gameScope.cancel()
+            parentFragmentManager.commit {
+                replace(R.id.fragmentContainer, GameOverFragment.newInstance(score, currentWave))
+                addToBackStack(null)
+            }
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        viewLifecycleOwner.lifecycleScope.cancel()
+        musicManager.releaseMediaPlayers()
+    }
 }

@@ -10,16 +10,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 
 class GameOverFragment : Fragment() {
-    companion object {
-        private const val ARG_SCORE = "score"  // Argumento para la puntuación final.
-        private const val ARG_WAVE = "wave"  // Argumento para la oleada alcanzada
+    private lateinit var musicManager: MusicManager
 
-        // Crea una instancia del fragmento con la puntuación y ola alcanzada.
+    companion object {
+        private const val ARG_SCORE = "score"
+        private const val ARG_WAVE = "wave"
+
         fun newInstance(score: Int, wave: Int): GameOverFragment {
             return GameOverFragment().apply {
                 arguments = Bundle().apply {
-                    putInt(ARG_SCORE, score)  // Agrega la puntuación
-                    putInt(ARG_WAVE, wave)  // Agrega la ola alcanzada
+                    putInt(ARG_SCORE, score)
+                    putInt(ARG_WAVE, wave)
                 }
             }
         }
@@ -36,6 +37,13 @@ class GameOverFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        // Inicializar MusicManager
+        musicManager = MusicManager(requireContext())
+
+        // Detener completamente cualquier música de game over
+        musicManager.stopAndReleaseGameOverTheme()
+
         // Obtiene la puntuación y la ola alcanzada de los argumentos.
         val score = arguments?.getInt(ARG_SCORE, 0) ?: 0
         val wave = arguments?.getInt(ARG_WAVE, 0) ?: 0
@@ -47,8 +55,10 @@ class GameOverFragment : Fragment() {
 
         // Configura el botón para jugar de nuevo.
         view.findViewById<Button>(R.id.btnPlayAgain).apply {
-            text = getString(R.string.fin_juego_jugar_nuevo)
             setOnClickListener {
+                // Detener completamente la música de game over
+                musicManager.stopAndReleaseGameOverTheme()
+
                 parentFragmentManager.commit {
                     replace(R.id.fragmentContainer, GameFragment())
                 }
@@ -59,10 +69,25 @@ class GameOverFragment : Fragment() {
         view.findViewById<Button>(R.id.btnMainMenu).apply {
             text = getString(R.string.fin_juego_menu_principal)
             setOnClickListener {
+                // Asegurarse de detener completamente la música de game over
+                musicManager.stopAndReleaseGameOverTheme()
+
                 parentFragmentManager.commit {
                     replace(R.id.fragmentContainer, MainMenuFragment())
                 }
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Adicional precaución para liberar recursos
+        musicManager.stopAndReleaseGameOverTheme()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Asegurarse de liberar los recursos de música
+        musicManager.stopAndReleaseGameOverTheme()
     }
 }
