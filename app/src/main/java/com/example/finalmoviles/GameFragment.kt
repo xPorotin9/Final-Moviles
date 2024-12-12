@@ -17,6 +17,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
+/**
+ * GameFragment is responsible for managing the game UI and logic.
+ * It handles the game lifecycle, user interactions, and updates the UI accordingly.
+ */
 class GameFragment : Fragment(), GameView.GameCallbacks {
     private var playerLives = 20
     private var playerMoney = 75
@@ -34,6 +38,9 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
 
     private lateinit var musicManager: MusicManager
 
+    /**
+     * Enum class representing different types of towers with their respective cost, damage, and range.
+     */
     enum class TowerType(val cost: Int, val damage: Int, val range: Float) {
         BASIC(50, 5, 150f),
         ADVANCED(120, 12, 200f)
@@ -50,7 +57,7 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Reiniciar completamente el MusicManager
+        // Initialize the MusicManager and start playing the main theme
         musicManager = MusicManager(requireContext())
         musicManager.loadMainTheme()
         musicManager.playMainTheme()
@@ -68,7 +75,9 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         startGame()
     }
 
-
+    /**
+     * Sets up the tower selectors and their click listeners.
+     */
     private fun setupTowerSelectors() {
         view?.findViewById<LinearLayout>(R.id.basicTower)?.let { basicTowerLayout ->
             basicTowerLayout.findViewById<TextView>(R.id.basicTowerName)?.text =
@@ -93,6 +102,9 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         }
     }
 
+    /**
+     * Sets up the touch listener for the game view to handle tower placement.
+     */
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGameViewTouchListener() {
         gameView.setOnTouchListener { _, event ->
@@ -121,6 +133,9 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         }
     }
 
+    /**
+     * Updates the UI elements with the current game state.
+     */
     @SuppressLint("SetTextI18n")
     private fun updateUI() {
         tvLives.text = getString(R.string.juego_vidas, playerLives)
@@ -129,14 +144,17 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         tvScore.text = getString(R.string.juego_puntos, score)
     }
 
+    /**
+     * Starts the game loop, managing waves and updating the game state.
+     */
     private fun startGame() {
-        // Asegurarse de que la música principal esté sonando al inicio
+        // Ensure the main theme music is playing at the start
         musicManager.loadMainTheme()
         musicManager.playMainTheme()
 
         viewLifecycleOwner.lifecycleScope.launch {
             while (playerLives > 0 && isActive) {
-                // Agregar verificación y reproducción de música
+                // Check and play main theme music if not already playing
                 if (!musicManager.isMainThemePlaying()) {
                     musicManager.playMainTheme()
                 }
@@ -159,6 +177,9 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         }
     }
 
+    /**
+     * Starts a new wave of enemies.
+     */
     private fun startWave() {
         val enemyCount = 5 + (currentWave * 2)
         viewLifecycleOwner.lifecycleScope.launch {
@@ -169,6 +190,11 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         }
     }
 
+    /**
+     * Calculates the duration of the current wave.
+     *
+     * @return The duration of the wave in milliseconds.
+     */
     private fun getWaveDuration(): Long {
         return (10000 + (currentWave * 1000)).toLong()
     }
@@ -192,15 +218,18 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         }
     }
 
+    /**
+     * Handles the game over state, stopping the game and transitioning to the GameOverFragment.
+     */
     private fun gameOver() {
-        // Asegúrate de que la música de game over se reproduzca antes de cambiar de fragmento
-        musicManager.stopAndReleaseGameOverTheme() // Liberar cualquier música anterior
+        // Ensure the game over music is played before changing the fragment
+        musicManager.stopAndReleaseGameOverTheme() // Release any previous music
         musicManager.loadGameOverTheme()
         musicManager.playGameOverTheme()
 
-        // Añade un pequeño retraso para permitir que la música comience a reproducirse
+        // Add a small delay to allow the music to start playing
         viewLifecycleOwner.lifecycleScope.launch {
-            delay(500) // Pequeño retraso para asegurar que la música comience
+            delay(500) // Small delay to ensure the music starts
             gameView.gameScope.cancel()
             parentFragmentManager.commit {
                 replace(R.id.fragmentContainer, GameOverFragment.newInstance(score, currentWave))
