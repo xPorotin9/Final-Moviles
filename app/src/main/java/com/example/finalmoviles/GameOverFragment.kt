@@ -9,6 +9,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 
+/**
+ * GameOverFragment is responsible for displaying the game over screen.
+ * It shows the final score, the wave reached, and provides options to play again or return to the main menu.
+ */
 class GameOverFragment : Fragment() {
     private lateinit var musicManager: MusicManager
 
@@ -16,6 +20,13 @@ class GameOverFragment : Fragment() {
         private const val ARG_SCORE = "score"
         private const val ARG_WAVE = "wave"
 
+        /**
+         * Creates a new instance of GameOverFragment with the provided score and wave.
+         *
+         * @param score The final score achieved by the player.
+         * @param wave The wave reached by the player.
+         * @return A new instance of GameOverFragment.
+         */
         fun newInstance(score: Int, wave: Int): GameOverFragment {
             return GameOverFragment().apply {
                 arguments = Bundle().apply {
@@ -36,13 +47,11 @@ class GameOverFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         // Obtener la instancia compartida del MusicManager
         musicManager = (activity as MainActivity).getMusicManager()
 
         val score = arguments?.getInt(ARG_SCORE, 0) ?: 0
         val wave = arguments?.getInt(ARG_WAVE, 0) ?: 0
-
         view.findViewById<TextView>(R.id.tvGameOverTitle).text = getString(R.string.fin_juego_titulo)
         view.findViewById<TextView>(R.id.tvFinalScore).text = getString(R.string.fin_juego_puntuacion, score)
         view.findViewById<TextView>(R.id.tvWaveReached).text = getString(R.string.fin_juego_oleada, wave)
@@ -69,13 +78,13 @@ class GameOverFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        // Adicional precaución para liberar recursos
+        // Additional precaution to release resources
         musicManager.stopAndReleaseGameOverTheme()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // Asegurarse de liberar los recursos de música
+        // Ensure to release music resources
         musicManager.stopAndReleaseGameOverTheme()
     }
 
