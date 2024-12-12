@@ -51,8 +51,9 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
         super.onViewCreated(view, savedInstanceState)
 
         // Reiniciar completamente el MusicManager
-        musicManager = MusicManager(requireContext())
-        musicManager.loadMainTheme()
+        //musicManager = MusicManager(requireContext())
+        //musicManager.loadMainTheme()
+        musicManager = (activity as MainActivity).getMusicManager()
         musicManager.playMainTheme()
 
         tvLives = view.findViewById(R.id.tvLives)
@@ -193,7 +194,6 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
     }
 
     private fun gameOver() {
-        // Asegúrate de que la música de game over se reproduzca antes de cambiar de fragmento
         musicManager.stopAndReleaseGameOverTheme() // Liberar cualquier música anterior
         musicManager.loadGameOverTheme()
         musicManager.playGameOverTheme()
@@ -212,6 +212,6 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
     override fun onDestroy() {
         super.onDestroy()
         viewLifecycleOwner.lifecycleScope.cancel()
-        musicManager.releaseMediaPlayers()
+        musicManager.stopAndReleaseGameOverTheme()
     }
 }

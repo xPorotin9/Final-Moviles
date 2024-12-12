@@ -37,41 +37,29 @@ class GameOverFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Obtener la instancia compartida del MusicManager
+        musicManager = (activity as MainActivity).getMusicManager()
 
-        // Inicializar MusicManager
-        musicManager = MusicManager(requireContext())
-
-        // Detener completamente cualquier música de game over
-        musicManager.stopAndReleaseGameOverTheme()
-
-        // Obtiene la puntuación y la ola alcanzada de los argumentos.
         val score = arguments?.getInt(ARG_SCORE, 0) ?: 0
         val wave = arguments?.getInt(ARG_WAVE, 0) ?: 0
 
-        // Muestra el título de fin de juego y la puntuación en los TextViews.
         view.findViewById<TextView>(R.id.tvGameOverTitle).text = getString(R.string.fin_juego_titulo)
         view.findViewById<TextView>(R.id.tvFinalScore).text = getString(R.string.fin_juego_puntuacion, score)
         view.findViewById<TextView>(R.id.tvWaveReached).text = getString(R.string.fin_juego_oleada, wave)
 
-        // Configura el botón para jugar de nuevo.
         view.findViewById<Button>(R.id.btnPlayAgain).apply {
             setOnClickListener {
-                // Detener completamente la música de game over
                 musicManager.stopAndReleaseGameOverTheme()
-
                 parentFragmentManager.commit {
                     replace(R.id.fragmentContainer, GameFragment())
                 }
             }
         }
 
-        // Configura el botón para volver al menú principal.
         view.findViewById<Button>(R.id.btnMainMenu).apply {
             text = getString(R.string.fin_juego_menu_principal)
             setOnClickListener {
-                // Asegurarse de detener completamente la música de game over
                 musicManager.stopAndReleaseGameOverTheme()
-
                 parentFragmentManager.commit {
                     replace(R.id.fragmentContainer, MainMenuFragment())
                 }
@@ -89,5 +77,13 @@ class GameOverFragment : Fragment() {
         super.onDestroy()
         // Asegurarse de liberar los recursos de música
         musicManager.stopAndReleaseGameOverTheme()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Solo detener la música si el fragmento está siendo destruido completamente
+        if (isRemoving) {
+            musicManager.stopAndReleaseGameOverTheme()
+        }
     }
 }
