@@ -9,17 +9,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 
-/**
- * MainMenuFragment is responsible for displaying the main menu of the game.
- * It provides options to start the game or view high scores.
- */
 class MainMenuFragment : Fragment() {
     companion object {
-        /**
-         * Creates a new instance of MainMenuFragment.
-         *
-         * @return A new instance of MainMenuFragment.
-         */
         fun newInstance(): MainMenuFragment {
             return MainMenuFragment()
         }
@@ -36,7 +27,9 @@ class MainMenuFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Configure the play button
+        // Ya no es necesario configurar el título de texto, ya que lo manejará el logo
+
+        // Configurar el botón de jugar
         view.findViewById<Button>(R.id.btnPlay).apply {
             text = getString(R.string.menu_boton_jugar)
             setOnClickListener {
@@ -47,11 +40,11 @@ class MainMenuFragment : Fragment() {
             }
         }
 
-        // Configure the high scores button
-        view.findViewById<Button>(R.id.btnHighScores).apply {
-            text = getString(R.string.menu_boton_puntuaciones)
-            setOnClickListener {
-                // To be implemented
+        // Configurar el botón de puntuaciones
+        view.findViewById<Button>(R.id.btnHighScores).setOnClickListener {
+            parentFragmentManager.commit {
+                replace(R.id.fragmentContainer, ScoresFragment.newInstance())
+                addToBackStack(null)
             }
         }
     }

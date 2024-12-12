@@ -9,6 +9,7 @@ junit = "4.13.2"
 androidx-junit = "1.1.5"
 espresso-core = "3.5.1"
 games-activity = "3.0.5"
+firebase-database-ktx = "21.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -21,6 +22,7 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-junit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 androidx-games-activity = { group = "androidx.games", name = "games-activity", version.ref = "games-activity" }
+firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebase-database-ktx" }
 
 [plugins]
 android-application = { id = "com.android.application", version = "8.6.0" }

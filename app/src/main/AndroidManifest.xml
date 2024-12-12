@@ -11,6 +11,8 @@
 
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,6 +23,7 @@
         <activity
             android:name=".GameFragment"
             android:exported="false"
+            android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="portrait"/>
 
     </application>
