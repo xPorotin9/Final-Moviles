@@ -69,6 +69,13 @@
                 android:textColor="@android:color/white" />
 
             <Button
+                android:id="@+id/btnSaveScore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Guardar Puntuación" />
+
+            <Button
                 android:id="@+id/btnMainMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

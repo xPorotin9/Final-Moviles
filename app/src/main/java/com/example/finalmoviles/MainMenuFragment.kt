@@ -41,10 +41,10 @@ class MainMenuFragment : Fragment() {
         }
 
         // Configurar el botón de puntuaciones
-        view.findViewById<Button>(R.id.btnHighScores).apply {
-            text = getString(R.string.menu_boton_puntuaciones)
-            setOnClickListener {
-                // Por implementar c:
+        view.findViewById<Button>(R.id.btnHighScores).setOnClickListener {
+            parentFragmentManager.commit {
+                replace(R.id.fragmentContainer, ScoresFragment.newInstance())
+                addToBackStack(null)
             }
         }
     }
