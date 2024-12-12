@@ -1,6 +1,5 @@
 package com.example.finalmoviles
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -42,6 +41,7 @@ class GameOverFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         // Obtener la instancia compartida del MusicManager
         musicManager = (activity as MainActivity).getMusicManager()
 

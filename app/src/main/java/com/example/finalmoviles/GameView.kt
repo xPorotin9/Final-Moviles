@@ -9,6 +9,15 @@ import kotlinx.coroutines.*
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+/**
+ * GameView is a custom view that handles the rendering and logic of the game.
+ * It manages the game loop, drawing of the grid, path, towers, and enemies.
+ *
+ * @constructor Creates a GameView with the specified context, attributes, and style.
+ * @param context The context of the application.
+ * @param attrs The attribute set for the view.
+ * @param defStyleAttr The default style attribute.
+ */
 class GameView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -83,20 +92,39 @@ class GameView @JvmOverloads constructor(
         )
     }
 
-    // Interfaz de callbacks para eventos del juego.
+    /**
+     * Interface for game callbacks to handle game events.
+     */
     interface GameCallbacks {
-        fun onEnemyReachedEnd(enemy: Enemy)  // Llamado cuando un enemigo llega al final.
-        fun onEnemyKilled(enemy: Enemy)  // Llamado cuando un enemigo es derrotado.
+        /**
+         * Called when an enemy reaches the end zone.
+         *
+         * @param enemy The enemy that reached the end.
+         */
+        fun onEnemyReachedEnd(enemy: Enemy)
+
+        /**
+         * Called when an enemy is killed.
+         *
+         * @param enemy The enemy that was killed.
+         */
+        fun onEnemyKilled(enemy: Enemy)
     }
 
     private var gameCallbacks: GameCallbacks? = null  // Referencia a los callbacks de juego.
 
-    // Configura los callbacks para los eventos del juego.
+    /**
+     * Sets the game callbacks for handling game events.
+     *
+     * @param callbacks The callbacks to set.
+     */
     fun setGameCallbacks(callbacks: GameCallbacks) {
         gameCallbacks = callbacks
     }
 
-    // Inicia el bucle principal de actualización de la vista de juego.
+    /**
+     * Starts the main game loop to update the game view.
+     */
     private fun startGameLoop() {
         gameScope.launch {
             while (isActive) {
@@ -108,7 +136,12 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    // Verifica si un enemigo ha colisionado con la zona final.
+    /**
+     * Checks if an enemy has collided with the end zone.
+     *
+     * @param enemy The enemy to check.
+     * @return True if the enemy has collided with the end zone, false otherwise.
+     */
     private fun checkEnemyCollision(enemy: Enemy): Boolean {
         val enemyRadius = 20f
         val enemyBounds = RectF(
@@ -120,7 +153,9 @@ class GameView @JvmOverloads constructor(
         return enemyBounds.intersect(endZone)
     }
 
-    // Actualiza la posición y estado de cada enemigo.
+    /**
+     * Updates the position and state of each enemy.
+     */
     private fun updateEnemies() {
         val iterator = enemies.iterator()
         while (iterator.hasNext()) {
@@ -142,7 +177,9 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    // Actualiza el comportamiento de cada torre para atacar enemigos dentro de su rango.
+    /**
+     * Updates the behavior of each tower to attack enemies within its range.
+     */
     private fun updateTowers() {
         towers.forEach { tower ->
             val target = enemies.firstOrNull { enemy ->
@@ -159,8 +196,13 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-
-    // Método para convertir coordenadas de pantalla a coordenadas de cuadrícula
+    /**
+     * Converts screen coordinates to grid coordinates.
+     *
+     * @param x The x-coordinate on the screen.
+     * @param y The y-coordinate on the screen.
+     * @return The grid coordinates as a pair, or null if invalid.
+     */
     private fun screenToGrid(x: Float, y: Float): Pair<Int, Int>? {
         val gridX = (x / (gridSize + gridSpacing)).toInt()
         val gridY = (y / (gridSize + gridSpacing)).toInt()
@@ -172,7 +214,13 @@ class GameView @JvmOverloads constructor(
         return null
     }
 
-    // Verificar si una posición de cuadrícula es válida
+    /**
+     * Checks if a grid position is valid.
+     *
+     * @param gridX The x-coordinate of the grid.
+     * @param gridY The y-coordinate of the grid.
+     * @return True if the position is valid, false otherwise.
+     */
     private fun isValidGridPosition(gridX: Int, gridY: Int): Boolean {
         val x = gridX * (gridSize + gridSpacing) + gridSize / 2
         val y = gridY * (gridSize + gridSpacing) + gridSize / 2
@@ -210,13 +258,26 @@ class GameView @JvmOverloads constructor(
 
         return true
     }
-    // Convertir coordenadas de cuadrícula a coordenadas de pantalla
+
+    /**
+     * Converts grid coordinates to screen coordinates.
+     *
+     * @param gridX The x-coordinate of the grid.
+     * @param gridY The y-coordinate of the grid.
+     * @return The screen coordinates as a pair.
+     */
     private fun gridToScreen(gridX: Int, gridY: Int): Pair<Float, Float> {
         val x = gridX * (gridSize + gridSpacing) + gridSize / 2
         val y = gridY * (gridSize + gridSpacing) + gridSize / 2
         return Pair(x, y)
     }
 
+    /**
+     * Adds a tower to the game view at the specified position.
+     *
+     * @param tower The tower to add.
+     * @return True if the tower was added successfully, false otherwise.
+     */
     fun addTower(tower: Tower): Boolean {
         val gridPos = screenToGrid(tower.x, tower.y) ?: return false
 
@@ -237,12 +298,22 @@ class GameView @JvmOverloads constructor(
         return true
     }
 
+    /**
+     * Shows an error message on the game view.
+     *
+     * @param message The error message to show.
+     */
     fun showError(message: String) {
         errorMessage = message
         errorMessageTimeout = System.currentTimeMillis() + 2000 // Mostrar por 2 segundos
         invalidate()
     }
 
+    /**
+     * Draws the game view, including the grid, path, towers, enemies, and error messages.
+     *
+     * @param canvas The canvas to draw on.
+     */
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -341,7 +412,11 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    // Agrega un nuevo enemigo al inicio de la ruta.
+    /**
+     * Adds a new enemy at the start of the path.
+     *
+     * @param wave The wave number to scale the enemy's attributes.
+     */
     fun spawnEnemy(wave: Int) {
         if (waypoints.isNotEmpty()) {
             enemies.add(Enemy.createForWave(wave, waypoints[0]))
