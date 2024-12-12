@@ -57,9 +57,7 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize the MusicManager and start playing the main theme
-        musicManager = MusicManager(requireContext())
-        musicManager.loadMainTheme()
+        musicManager = (activity as MainActivity).getMusicManager()
         musicManager.playMainTheme()
 
         tvLives = view.findViewById(R.id.tvLives)
@@ -222,8 +220,7 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
      * Handles the game over state, stopping the game and transitioning to the GameOverFragment.
      */
     private fun gameOver() {
-        // Ensure the game over music is played before changing the fragment
-        musicManager.stopAndReleaseGameOverTheme() // Release any previous music
+        musicManager.stopAndReleaseGameOverTheme() // Liberar cualquier música anterior
         musicManager.loadGameOverTheme()
         musicManager.playGameOverTheme()
 
@@ -241,6 +238,6 @@ class GameFragment : Fragment(), GameView.GameCallbacks {
     override fun onDestroy() {
         super.onDestroy()
         viewLifecycleOwner.lifecycleScope.cancel()
-        musicManager.releaseMediaPlayers()
+        musicManager.stopAndReleaseGameOverTheme()
     }
 }
